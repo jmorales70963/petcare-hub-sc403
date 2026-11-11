@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head(${producto.nombre})}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<main class="container my-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/productos}">Catálogo</a></li>
+            <li class="breadcrumb-item active" th:text="${producto.nombre}">Producto</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5 align-items-center">
+        <div class="col-md-6">
+            <div class="card-pch p-4 text-center">
+                <img th:src="${producto.rutaImagen}" class="img-fluid rounded-4" style="max-height: 380px; object-fit: cover;" th:alt="${producto.nombre}"/>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <small class="text-muted fw-bold text-uppercase" th:text="${producto.marca} + ' • SKU: ' + ${producto.sku}">ROYAL CANIN</small>
+            <h2 class="fw-bold text-petroleo mt-1 mb-3" th:text="${producto.nombre}">Royal Canin Mini Adult - 7.5 kg</h2>
+            <p class="text-secondary" th:text="${producto.descripcion}">Descripción completa</p>
+
+            <h3 class="fw-bold text-petroleo mb-0" th:text="'₡' + ${#numbers.formatDecimal(producto.precio, 1, 'POINT', 0, 'COMMA')}">₡36.000</h3>
+            <small class="text-muted d-block mb-3">IVA (13%) incluido en el precio final</small>
+
+            <div class="mb-3">
+                <span th:if="${producto.existencias > 0}" class="badge bg-success-subtle text-success px-3 py-2">
+                    <i class="fa-solid fa-check me-1"></i> En Stock (<span th:text="${producto.existencias}">24</span> unidades disponibles en bodega)
+                </span>
+                <span th:if="${producto.existencias == 0}" class="badge bg-danger-subtle text-danger px-3 py-2">
+                    Agotado
+                </span>
+            </div>
+
+            <form th:action="@{/carrito/agregar}" method="post" class="d-flex gap-3 align-items-center mb-4">
+                <input type="hidden" name="idProducto" th:value="${producto.idProducto}"/>
+                <input type="number" name="cantidad" value="1" min="1" th:max="${producto.existencias}" class="form-control text-center" style="width: 90px;"/>
+                <button type="submit" class="btn btn-coral flex-grow-1 py-2" th:disabled="${producto.existencias == 0}">
+                    <i class="fa-solid fa-cart-plus me-2"></i>Agregar al carrito
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card-pch p-4 mt-5">
+        <h5 class="fw-bold text-petroleo">Información nutricional e ingredientes</h5>
+        <p class="text-secondary mb-0" th:text="${producto.ingredientes}">Ingredientes</p>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

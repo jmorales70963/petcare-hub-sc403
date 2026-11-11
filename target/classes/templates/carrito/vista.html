@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head('Tu Carrito')}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<main class="container my-4">
+    <small class="text-coral fw-bold text-uppercase">Casi listo</small>
+    <h2 class="fw-bold text-petroleo mb-4">Tu carrito</h2>
+
+    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div th:if="${#lists.isEmpty(items)}" class="card-pch p-5 text-center">
+                <p class="text-muted mb-3">Tu carrito está vacío en este momento.</p>
+                <a th:href="@{/productos}" class="btn btn-coral">Explorar productos</a>
+            </div>
+
+            <div class="card-pch p-3 mb-3" th:each="item : ${items}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <img th:src="${item.producto.rutaImagen}" class="rounded-3" style="width: 75px; height: 75px; object-fit: cover;"/>
+                        <div>
+                            <small class="text-muted text-uppercase" th:text="${item.producto.marca}">MARCA</small>
+                            <h6 class="fw-bold mb-1" th:text="${item.producto.nombre}">Producto</h6>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <form th:action="@{/carrito/actualizar}" method="post" class="d-inline">
+                            <input type="hidden" name="idProducto" th:value="${item.producto.idProducto}"/>
+                            <input type="hidden" name="delta" value="-1"/>
+                            <button class="btn btn-sm btn-outline-secondary">-</button>
+                        </form>
+                        <span class="fw-bold px-2" th:text="${item.cantidad}">1</span>
+                        <form th:action="@{/carrito/actualizar}" method="post" class="d-inline">
+                            <input type="hidden" name="idProducto" th:value="${item.producto.idProducto}"/>
+                            <input type="hidden" name="delta" value="1"/>
+                            <button class="btn btn-sm btn-outline-secondary">+</button>
+                        </form>
+                    </div>
+                    <div class="fw-bold fs-5 text-petroleo" th:text="'₡' + ${#numbers.formatDecimal(item.subtotal, 1, 'POINT', 0, 'COMMA')}">₡36.000</div>
+                </div>
+            </div>
+
+            <div class="card-pch p-3 mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-1"><i class="fa-solid fa-truck-fast text-petroleo me-2"></i>Entrega a domicilio</h6>
+                        <small class="text-muted">San José, Escazú, San Rafael &bull; Casa 12B</small>
+                    </div>
+                    <span class="badge bg-info-subtle text-dark">Dirección principal</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card-pch p-4">
+                <h5 class="fw-bold text-petroleo mb-3">Resumen del pedido</h5>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-semibold" th:text="'₡' + ${#numbers.formatDecimal(total, 1, 'POINT', 0, 'COMMA')}">₡54.900</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Envío</span>
+                    <span class="text-success fw-semibold">Gratis</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 small">
+                    <span class="text-muted">IVA incluido (13%)</span>
+                    <span th:text="'₡' + ${#numbers.formatDecimal(iva, 1, 'POINT', 0, 'COMMA')}">₡7.137</span>
+                </div>
+                <hr/>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold">Total</span>
+                    <span class="fs-4 fw-bold text-coral" th:text="'₡' + ${#numbers.formatDecimal(total, 1, 'POINT', 0, 'COMMA')}">₡54.900</span>
+                </div>
+
+                <form th:action="@{/carrito/confirmar}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Método de pago</label>
+                        <div class="form-check border rounded p-2 mb-2 ps-4">
+                            <input class="form-check-input" type="radio" name="metodoPago" checked="checked"/>
+                            <label class="form-check-label small fw-semibold">Tarjeta terminada en &bull;&bull;&bull;&bull; 4589</label>
+                        </div>
+                        <div class="form-check border rounded p-2 ps-4">
+                            <input class="form-check-input" type="radio" name="metodoPago"/>
+                            <label class="form-check-label small fw-semibold">SINPE Móvil (Transferencia inmediata)</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-coral w-100 py-2" th:disabled="${#lists.isEmpty(items)}">
+                        <i class="fa-solid fa-lock me-2"></i>Confirmar y pagar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

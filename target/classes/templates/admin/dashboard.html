@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head('Dashboard Administrativo')}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <small class="text-coral fw-bold text-uppercase">Panel de control</small>
+            <h2 class="fw-bold text-petroleo mb-0">Buenos días, Adriana</h2>
+            <p class="text-muted mb-0">Este es el estado de PetCare Hub hoy.</p>
+        </div>
+        <button class="btn btn-coral px-4 py-2" data-bs-toggle="modal" data-bs-target="#modalProducto">
+            + Nuevo producto
+        </button>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-pch p-3">
+                <small class="text-muted">Ventas del mes</small>
+                <h4 class="fw-bold text-petroleo mb-0">₡3.420.500</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-pch p-3">
+                <small class="text-muted">Órdenes pendientes</small>
+                <h4 class="fw-bold text-petroleo mb-0">12 pedidos</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-pch p-3">
+                <small class="text-muted">Citas de hoy</small>
+                <h4 class="fw-bold text-petroleo mb-0">8 citas</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-pch p-3 border-warning">
+                <small class="text-danger fw-semibold"><i class="fa-solid fa-triangle-exclamation me-1"></i>Stock crítico</small>
+                <h4 class="fw-bold text-danger mb-0" th:text="${stockCritico} + ' productos'">1 productos</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-pch p-4">
+        <h5 class="fw-bold text-petroleo mb-3">Inventario de productos</h5>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>SKU</th>
+                        <th>CATEGORÍA</th>
+                        <th>PRECIO</th>
+                        <th>EXISTENCIAS</th>
+                        <th>ESTADO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${productos}">
+                        <td>
+                            <div class="fw-bold" th:text="${p.nombre}">Producto</div>
+                            <small class="text-muted" th:text="${p.marca}">Marca</small>
+                        </td>
+                        <td th:text="${p.sku}">PC-001</td>
+                        <td th:text="${p.categoria.nombre}">Alimentos</td>
+                        <td th:text="'₡' + ${#numbers.formatDecimal(p.precio, 1, 'POINT', 0, 'COMMA')}">₡36.000</td>
+                        <td class="fw-bold" th:text="${p.existencias}">24</td>
+                        <td>
+                            <span th:if="${!p.activo}" class="badge bg-secondary">Inactivo</span>
+                            <span th:if="${p.activo and p.existencias < 5}" class="badge bg-warning text-dark">Stock crítico</span>
+                            <span th:if="${p.activo and p.existencias >= 5}" class="badge bg-success-subtle text-success">Activo</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/productos/estado/{id}(id=${p.idProducto})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                        th:text="${p.activo ? 'Pausar' : 'Activar'}">Pausar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalProducto" tabindex="-1">
+        <div class="modal-dialog">
+            <form th:action="@{/admin/productos/guardar}" th:object="${nuevoProducto}" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Registrar Producto en Bodega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2 mb-2">
+                        <div class="col-4">
+                            <label class="form-label small">SKU</label>
+                            <input type="text" th:field="*{sku}" class="form-control" placeholder="PC-007" required="required"/>
+                        </div>
+                        <div class="col-8">
+                            <label class="form-label small">Nombre</label>
+                            <input type="text" th:field="*{nombre}" class="form-control" required="required"/>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small">Marca</label>
+                            <input type="text" th:field="*{marca}" class="form-control" required="required"/>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Especie</label>
+                            <select th:field="*{especie}" class="form-select">
+                                <option value="Perros">Perros</option>
+                                <option value="Gatos">Gatos</option>
+                                <option value="Ambos">Ambos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small">Categoría</label>
+                            <select th:field="*{categoria.idCategoria}" class="form-select">
+                                <option th:each="c : ${categorias}" th:value="${c.idCategoria}" th:text="${c.nombre}"></option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <label class="form-label small">Precio (₡)</label>
+                            <input type="number" th:field="*{precio}" class="form-control" required="required"/>
+                        </div>
+                        <div class="col-3">
+                            <label class="form-label small">Stock</label>
+                            <input type="number" th:field="*{existencias}" class="form-control" required="required"/>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">URL Imagen</label>
+                        <input type="text" th:field="*{rutaImagen}" class="form-control" value="https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=600&q=80"/>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Descripción</label>
+                        <textarea th:field="*{descripcion}" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-coral">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

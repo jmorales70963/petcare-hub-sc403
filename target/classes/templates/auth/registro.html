@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head('Registro de Cliente')}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+<main class="container my-5" style="max-width: 500px;">
+    <div class="card-pch p-4">
+        <h4 class="fw-bold text-petroleo mb-3">Crear cuenta de cliente</h4>
+        <div th:if="${error}" class="alert alert-danger small" th:text="${error}"></div>
+        <form th:action="@{/registro/guardar}" th:object="${usuario}" method="post">
+            <div class="mb-2">
+                <label class="form-label small">Nombre completo</label>
+                <input type="text" th:field="*{nombre}" class="form-control" required="required"/>
+            </div>
+            <div class="mb-2">
+                <label class="form-label small">Identificación</label>
+                <input type="text" th:field="*{identificacion}" class="form-control" required="required"/>
+            </div>
+            <div class="mb-2">
+                <label class="form-label small">Correo electrónico</label>
+                <input type="email" th:field="*{correo}" class="form-control" required="required"/>
+            </div>
+            <div class="mb-2">
+                <label class="form-label small">Teléfono</label>
+                <input type="text" th:field="*{telefono}" class="form-control" required="required"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small">Contraseña (mínimo 8 caracteres, números y mayúsculas)</label>
+                <input type="password" th:field="*{password}" pattern="(?=.*\d)(?=.*[A-Z]).{8,}" class="form-control" required="required"/>
+            </div>
+            <button type="submit" class="btn btn-coral w-100 py-2">Registrar cuenta</button>
+        </form>
+    </div>
+</main>
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head('Inicio')}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<main class="container my-4">
+    <section class="hero-section mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge rounded-pill bg-white text-coral px-3 py-2 mb-3 shadow-sm">
+                    &bull; CUIDADO EXPERTO, AMOR VERDADERO
+                </span>
+                <h1 class="display-5 fw-bold text-petroleo mb-3">
+                    Todo lo que tu mascota necesita, <span class="text-coral d-block">en un solo lugar.</span>
+                </h1>
+                <p class="lead text-secondary mb-4">
+                    Productos seleccionados y servicios profesionales para acompañar cada etapa de su vida.
+                </p>
+                <div class="d-flex gap-3">
+                    <a th:href="@{/productos}" class="btn btn-coral px-4 py-2">Explorar catálogo &rarr;</a>
+                    <a th:href="@{/servicios}" class="btn btn-outline-dark bg-white px-4 py-2">
+                        <i class="fa-regular fa-calendar me-2"></i>Agendar una cita
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80"
+                     alt="Golden Retriever PetCare Hub" class="img-fluid rounded-circle shadow" style="width: 320px; height: 320px; object-fit: cover;"/>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <small class="text-coral fw-bold text-uppercase">Encuentra lo ideal</small>
+                <h3 class="fw-bold text-petroleo mb-0">Compra por categoría</h3>
+            </div>
+            <a th:href="@{/productos}" class="text-decoration-none small fw-semibold">Ver todas &rarr;</a>
+        </div>
+        <div class="row g-3">
+            <div class="col-6 col-md-3" th:each="cat : ${categorias}">
+                <a th:href="@{/productos(idCategoria=${cat.idCategoria})}" class="text-decoration-none text-dark">
+                    <div class="card-pch p-4 text-center h-100">
+                        <i class="fa-solid fs-1 text-petroleo mb-3" th:classappend="${cat.icono}"></i>
+                        <h6 class="fw-bold mb-1" th:text="${cat.nombre}">Categoría</h6>
+                        <small class="text-muted" th:text="${cat.descripcion}">Descripción</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <small class="text-coral fw-bold text-uppercase">Favoritos de la comunidad</small>
+                <h3 class="fw-bold text-petroleo mb-0">Los más queridos</h3>
+            </div>
+            <a th:href="@{/productos}" class="text-decoration-none small fw-semibold">Ver catálogo &rarr;</a>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-3" th:each="p, iter : ${productos}" th:if="${iter.index < 4}">
+                <div class="card-pch p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <a th:href="@{/productos/{id}(id=${p.idProducto})}">
+                            <img th:src="${p.rutaImagen}" class="img-fluid rounded-3 mb-3 w-100" style="height: 180px; object-fit: cover;" th:alt="${p.nombre}"/>
+                        </a>
+                        <small class="text-muted text-uppercase fw-semibold" th:text="${p.marca}">MARCA</small>
+                        <h6 class="fw-bold mt-1">
+                            <a th:href="@{/productos/{id}(id=${p.idProducto})}" class="text-dark text-decoration-none" th:text="${p.nombre}">Nombre</a>
+                        </h6>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fs-5 fw-bold text-petroleo" th:text="'₡' + ${#numbers.formatDecimal(p.precio, 1, 'POINT', 0, 'COMMA')}">₡36.000</span>
+                        <form th:action="@{/carrito/agregar}" method="post">
+                            <input type="hidden" name="idProducto" th:value="${p.idProducto}"/>
+                            <button type="submit" class="btn btn-sm rounded-circle text-white" style="background-color: var(--pch-primary); width: 34px; height: 34px;">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

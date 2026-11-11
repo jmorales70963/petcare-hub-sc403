@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head('Mis Mascotas y Citas')}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <small class="text-coral fw-bold text-uppercase">Su bienestar, organizado</small>
+            <h2 class="fw-bold text-petroleo mb-0">Mis mascotas y citas</h2>
+            <p class="text-muted mb-0">Gestiona sus perfiles y reserva el cuidado que necesitan.</p>
+        </div>
+        <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modalMascota">
+            + Registrar mascota
+        </button>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <h6 class="fw-bold text-petroleo mb-3">Mis compañeros</h6>
+            <div class="card-pch p-3 mb-3 border-2" th:each="m : ${mascotas}">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 bg-light d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="fa-solid fa-dog fs-3 text-petroleo" th:if="${m.especie == 'Perro'}"></i>
+                        <i class="fa-solid fa-cat fs-3 text-coral" th:if="${m.especie != 'Perro'}"></i>
+                    </div>
+                    <div>
+                        <small class="text-coral fw-bold text-uppercase" th:text="${m.especie}">PERRO</small>
+                        <h5 class="fw-bold mb-0" th:text="${m.nombre}">Toby</h5>
+                        <small class="text-muted d-block" th:text="${m.raza} + ' • ' + ${m.edad} + ' años • ' + ${m.peso} + ' kg'">Golden Retriever</small>
+                        <small class="text-secondary" th:text="${m.notasClinicas}">Control al día</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card-pch p-4">
+                <small class="text-coral fw-bold text-uppercase">Reserva en minutos</small>
+                <h4 class="fw-bold text-petroleo mb-4">Agendar nueva cita</h4>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">1. ¿Para quién es la cita?</label>
+                    <select class="form-select">
+                        <option th:each="m : ${mascotas}" th:value="${m.idMascota}" th:text="${m.nombre} + ' (' + ${m.especie} + ')'"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">2. Elige el servicio</label>
+                    <select class="form-select">
+                        <option th:each="s : ${servicios}" th:value="${s.idServicio}"
+                                th:text="${s.nombre} + ' — ₡' + ${#numbers.formatDecimal(s.precio, 1, 'POINT', 0, 'COMMA')} + ' (' + ${s.duracionMinutos} + ' min)'"></option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">3. Fecha y bloque horario disponible</label>
+                    <input type="date" class="form-control mb-2" value="2026-11-15"/>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success flex-fill">09:00</button>
+                        <button type="button" class="btn btn-outline-secondary flex-fill">11:00</button>
+                        <button type="button" class="btn btn-light text-muted flex-fill" disabled="disabled">14:00 (Ocupado)</button>
+                        <button type="button" class="btn btn-outline-secondary flex-fill">16:00</button>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-coral w-100 py-2">Confirmar reserva &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalMascota" tabindex="-1">
+        <div class="modal-dialog">
+            <form th:action="@{/cliente/mascotas/guardar}" th:object="${nuevaMascota}" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Registrar Nueva Mascota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <label class="form-label small">Nombre</label>
+                        <input type="text" th:field="*{nombre}" class="form-control" required="required"/>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small">Especie</label>
+                            <select th:field="*{especie}" class="form-select">
+                                <option value="Perro">Perro</option>
+                                <option value="Gato">Gato</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Raza</label>
+                            <input type="text" th:field="*{raza}" class="form-control" required="required"/>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small">Edad (años)</label>
+                            <input type="number" th:field="*{edad}" class="form-control" required="required"/>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Peso (kg)</label>
+                            <input type="number" step="0.1" th:field="*{peso}" class="form-control" required="required"/>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Alergias / Notas clínicas</label>
+                        <input type="text" th:field="*{notasClinicas}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-coral">Guardar en expediente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

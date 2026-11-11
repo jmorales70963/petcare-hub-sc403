@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/plantilla :: head('Iniciar Sesión')}"></head>
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+<main class="container my-5" style="max-width: 440px;">
+    <div class="card-pch p-4">
+        <h4 class="fw-bold text-petroleo mb-3 text-center">Acceso a PetCare Hub</h4>
+        <div th:if="${param.error}" class="alert alert-danger small">Credenciales inválidas.</div>
+        <div th:if="${exito}" class="alert alert-success small" th:text="${exito}"></div>
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Correo electrónico</label>
+                <input type="email" name="correo" class="form-control" placeholder="adriana@petcarehub.cr" required="required"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Contraseña</label>
+                <input type="password" name="password" class="form-control" placeholder="12345678A" required="required"/>
+            </div>
+            <button type="submit" class="btn btn-coral w-100 py-2">Ingresar</button>
+        </form>
+        <div class="text-center mt-3 small">
+            ¿No tienes cuenta? <a th:href="@{/registro}" class="text-coral fw-semibold">Regístrate aquí</a>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>
